@@ -1,13 +1,12 @@
-// Prisma Schema for Lahore Elite School & LMS
-// Supports local SQLite for immediate zero-config persistence & testing,
-// and PostgreSQL for production deployment.
+// PostgreSQL Production Schema for Lahore Elite School & LMS
+// Use this schema when deploying with PostgreSQL.
 
 generator client {
   provider = "prisma-client-js"
 }
 
 datasource db {
-  provider = "sqlite"
+  provider = "postgresql"
   url      = env("DATABASE_URL")
 }
 
@@ -37,8 +36,8 @@ model User {
 
 model Campus {
   id        String   @id @default(uuid())
-  name      String   // e.g. "Al-Nisa Campus", "Sabzazar Campus"
-  code      String   @unique // e.g. "AL_NISA", "SABZAZAR"
+  name      String
+  code      String   @unique
   address   String
   phone     String
   email     String?
@@ -57,7 +56,7 @@ model Campus {
 
 model AcademicSession {
   id        String   @id @default(uuid())
-  name      String   // e.g. "2025-2026"
+  name      String
   startDate DateTime
   endDate   DateTime
   isCurrent Boolean  @default(false)
@@ -73,8 +72,8 @@ model AcademicSession {
 
 model Class {
   id         String   @id @default(uuid())
-  name       String   // e.g. "Playgroup", "Class 1", "Class 9", "Class 10"
-  code       String   // e.g. "PG", "C1", "C9", "C10"
+  name       String
+  code       String
   orderIndex Int      @default(0)
   campusId   String?
   campus     Campus?  @relation(fields: [campusId], references: [id])
@@ -93,7 +92,7 @@ model Class {
 
 model Section {
   id         String   @id @default(uuid())
-  name       String   // e.g. "Rose", "Jasmine", "Section A", "Section B"
+  name       String
   classId    String
   class      Class    @relation(fields: [classId], references: [id], onDelete: Cascade)
   capacity   Int      @default(30)
@@ -107,7 +106,7 @@ model Section {
 
 model Subject {
   id        String   @id @default(uuid())
-  name      String   // e.g. "English", "Mathematics", "Science", "Urdu", "Islamiat"
+  name      String
   code      String
   classId   String
   class     Class    @relation(fields: [classId], references: [id], onDelete: Cascade)
@@ -121,14 +120,14 @@ model Subject {
 
 model Student {
   id                 String          @id @default(uuid())
-  admissionNo        String          @unique // e.g. "LES-2025-001"
+  admissionNo        String          @unique
   userId             String?         @unique
   user               User?           @relation(fields: [userId], references: [id])
   fullName           String
   fatherName         String
   guardianRelation   String          @default("Father")
   dob                DateTime
-  gender             String          // Male, Female
+  gender             String
   phone              String
   whatsapp           String?
   email              String?
@@ -144,8 +143,8 @@ model Student {
   address            String
   monthlyTuitionFee  Float           @default(5000)
   discountAmount     Float           @default(0)
-  feeStatus          String          @default("CURRENT") // CURRENT, OVERDUE, DEFAULTER
-  enrollmentStatus   String          @default("ACTIVE")  // ACTIVE, WITHDRAWN, ALUMNI, SUSPENDED
+  feeStatus          String          @default("CURRENT")
+  enrollmentStatus   String          @default("ACTIVE")
   bFormNo            String?
   photoUrl           String?
   emergencyContact   String?
@@ -166,20 +165,20 @@ model Student {
 
 model Staff {
   id               String    @id @default(uuid())
-  employeeId       String    @unique // e.g. "EMP-101"
+  employeeId       String    @unique
   userId           String?   @unique
   user             User?     @relation(fields: [userId], references: [id])
   fullName         String
   phone            String
   whatsapp         String?
   email            String?
-  designation      String    // e.g. "Senior Science Teacher", "Coordinator", "Principal"
-  department       String    // e.g. "Academics", "Administration", "Sports"
+  designation      String
+  department       String
   campusId         String
   campus           Campus    @relation(fields: [campusId], references: [id])
   joiningDate      DateTime  @default(now())
   basicSalary      Float     @default(35000)
-  status           String    @default("ACTIVE") // ACTIVE, ON_LEAVE, RESIGNED, TERMINATED
+  status           String    @default("ACTIVE")
   photoUrl         String?
   address          String?
   emergencyContact String?
@@ -201,13 +200,13 @@ model Staff {
 
 model Attendance {
   id         String   @id @default(uuid())
-  date       DateTime // Midnight date
-  entityType String   // STUDENT, STAFF
+  date       DateTime
+  entityType String
   studentId  String?
   student    Student? @relation(fields: [studentId], references: [id], onDelete: Cascade)
   staffId    String?
   staff      Staff?   @relation(fields: [staffId], references: [id], onDelete: Cascade)
-  status     String   // PRESENT, ABSENT, LATE, LEAVE
+  status     String
   notes      String?
   recordedBy String?
   campusId   String?
@@ -234,9 +233,9 @@ model Timetable {
   subject           Subject         @relation(fields: [subjectId], references: [id])
   staffId           String
   staff             Staff           @relation(fields: [staffId], references: [id])
-  dayOfWeek         String          // Monday, Tuesday, Wednesday, Thursday, Friday, Saturday
-  startTime         String          // "08:30"
-  endTime           String          // "09:15"
+  dayOfWeek         String
+  startTime         String
+  endTime           String
   room              String?
   createdAt         DateTime        @default(now())
   updatedAt         DateTime        @updatedAt
@@ -253,7 +252,7 @@ model FeeStructure {
   campus            Campus          @relation(fields: [campusId], references: [id])
   classId           String
   class             Class           @relation(fields: [classId], references: [id])
-  feeType           String          // ADMISSION, TUITION, SECURITY, ANNUAL, LAB, EXAM
+  feeType           String
   amount            Float           @default(0)
   createdAt         DateTime        @default(now())
 
@@ -262,12 +261,12 @@ model FeeStructure {
 
 model FeeVoucher {
   id                String          @id @default(uuid())
-  voucherNo         String          @unique // e.g. "VOU-202510-0001"
+  voucherNo         String          @unique
   studentId         String
   student           Student         @relation(fields: [studentId], references: [id])
   academicSessionId String
   academicSession   AcademicSession @relation(fields: [academicSessionId], references: [id])
-  feeMonth          String          // e.g. "October 2025"
+  feeMonth          String
   issueDate         DateTime        @default(now())
   dueDate           DateTime
   tuitionFee        Float           @default(0)
@@ -277,7 +276,7 @@ model FeeVoucher {
   totalAmount       Float           @default(0)
   paidAmount        Float           @default(0)
   balance           Float           @default(0)
-  status            String          @default("UNPAID") // UNPAID, PARTIAL, PAID
+  status            String          @default("UNPAID")
   familyVoucherId   String?
   familyVoucher     FamilyVoucher?  @relation(fields: [familyVoucherId], references: [id])
   notes             String?
@@ -293,7 +292,7 @@ model FeeVoucher {
 
 model FamilyVoucher {
   id            String       @id @default(uuid())
-  voucherNo     String       @unique // e.g. "FAM-202510-001"
+  voucherNo     String       @unique
   guardianName  String
   guardianPhone String
   totalAmount   Float        @default(0)
@@ -311,14 +310,14 @@ model FamilyVoucher {
 
 model Payment {
   id            String     @id @default(uuid())
-  receiptNo     String     @unique // e.g. "REC-2025-0001"
+  receiptNo     String     @unique
   voucherId     String
   voucher       FeeVoucher @relation(fields: [voucherId], references: [id])
   studentId     String
   student       Student    @relation(fields: [studentId], references: [id])
   amount        Float
   paymentDate   DateTime   @default(now())
-  paymentMethod String     @default("CASH") // CASH, BANK_TRANSFER, CHEQUE, ONLINE
+  paymentMethod String     @default("CASH")
   referenceNo   String?
   receivedBy    String?
   notes         String?
@@ -330,15 +329,15 @@ model Payment {
 
 model Payroll {
   id           String    @id @default(uuid())
-  payrollMonth String    // "October"
-  payrollYear  Int       // 2025
+  payrollMonth String
+  payrollYear  Int
   staffId      String
   staff        Staff     @relation(fields: [staffId], references: [id])
   basicSalary  Float
   allowances   Float     @default(0)
   deductions   Float     @default(0)
   netPayable   Float
-  status       String    @default("PENDING") // PENDING, PAID
+  status       String    @default("PENDING")
   paymentDate  DateTime?
   paymentMethod String?
   paymentRef   String?
@@ -353,8 +352,8 @@ model Payroll {
 
 model IncomeExpense {
   id           String   @id @default(uuid())
-  type         String   // INCOME, EXPENSE
-  category     String   // e.g. "FEES", "DONATION", "SALARY", "UTILITIES", "MAINTENANCE", "STATIONERY"
+  type         String
+  category     String
   description  String
   amount       Float
   date         DateTime @default(now())
@@ -373,8 +372,8 @@ model Examination {
   id                String          @id @default(uuid())
   academicSessionId String
   academicSession   AcademicSession @relation(fields: [academicSessionId], references: [id])
-  name              String          // e.g. "Mid Term Examinations 2025", "Final Term 2026"
-  term              String          // First Term, Mid Term, Final Term
+  name              String
+  term              String
   startDate         DateTime
   endDate           DateTime
   isPublished       Boolean         @default(false)
@@ -393,8 +392,8 @@ model ExamSubject {
   subjectId    String
   subject      Subject     @relation(fields: [subjectId], references: [id])
   examDate     DateTime
-  startTime    String      // "09:00 AM"
-  endTime      String      // "12:00 PM"
+  startTime    String
+  endTime      String
   totalMarks   Float       @default(100)
   passingMarks Float       @default(40)
   roomNo       String?
@@ -413,9 +412,9 @@ model ExamResult {
   student       Student     @relation(fields: [studentId], references: [id])
   marksObtained Float
   totalMarks    Float       @default(100)
-  grade         String      // A+, A, B, C, D, F
+  grade         String
   remarks       String?
-  status        String      @default("PUBLISHED") // DRAFT, SUBMITTED, APPROVED, PUBLISHED
+  status        String      @default("PUBLISHED")
   createdAt     DateTime    @default(now())
   updatedAt     DateTime    @updatedAt
 
@@ -426,30 +425,30 @@ model ExamResult {
 model QuestionPaper {
   id           String   @id @default(uuid())
   title        String
-  examType     String   // Mid Term, Final Term, Monthly Test
+  examType     String
   classId      String
   class        Class    @relation(fields: [classId], references: [id])
   subjectId    String
   subject      Subject  @relation(fields: [subjectId], references: [id])
-  duration     String   // e.g. "2 Hours 30 Mins"
+  duration     String
   totalMarks   Float    @default(100)
   instructions String?
-  status       String   @default("DRAFT") // DRAFT, PUBLISHED
-  questionsJson String   // JSON string containing array of questions with types (MCQ, Short, Long, FillBlank, TrueFalse)
+  status       String   @default("DRAFT")
+  questionsJson String
   createdAt    DateTime @default(now())
   updatedAt    DateTime @updatedAt
 }
 
 model Certificate {
   id            String    @id @default(uuid())
-  certificateNo String    @unique // e.g. "CERT-2025-001"
-  recipientType String    @default("STUDENT") // STUDENT, STAFF
+  certificateNo String    @unique
+  recipientType String    @default("STUDENT")
   studentId     String?
   student       Student?  @relation(fields: [studentId], references: [id])
   staffId       String?
   staff         Staff?    @relation(fields: [staffId], references: [id])
   recipientName String
-  templateType  String    // ACHIEVEMENT, EXCELLENCE, PARTICIPATION, CHARACTER, COMPLETION, SERVICE
+  templateType  String
   title         String
   description   String
   issueDate     DateTime  @default(now())
@@ -462,7 +461,7 @@ model Announcement {
   id          String    @id @default(uuid())
   title       String
   message     String
-  targetRole  String    @default("ALL") // ALL, STUDENTS, TEACHERS, PARENTS
+  targetRole  String    @default("ALL")
   campusId    String?
   classId     String?
   isPublished Boolean   @default(true)
@@ -477,7 +476,7 @@ model Notification {
   user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
   title     String
   message   String
-  type      String   @default("INFO") // INFO, WARNING, SUCCESS, FEE, EXAM
+  type      String   @default("INFO")
   isRead    Boolean  @default(false)
   link      String?
   createdAt DateTime @default(now())
@@ -506,11 +505,11 @@ model LeaveRequest {
   id            String    @id @default(uuid())
   staffId       String
   staff         Staff     @relation(fields: [staffId], references: [id])
-  leaveType     String    // SICK, CASUAL, ANNUAL, EMERGENCY
+  leaveType     String
   startDate     DateTime
   endDate       DateTime
   reason        String
-  status        String    @default("PENDING") // PENDING, APPROVED, REJECTED
+  status        String    @default("PENDING")
   approvedBy    String?
   approvalNotes String?
   createdAt     DateTime  @default(now())
@@ -528,7 +527,7 @@ model AdmissionInquiry {
   campusName     String
   previousSchool String?
   message        String?
-  status         String   @default("PENDING") // PENDING, REVIEWED, ACCEPTED, REJECTED
+  status         String   @default("PENDING")
   notes          String?
   createdAt      DateTime @default(now())
 }
@@ -540,7 +539,7 @@ model ContactInquiry {
   phone     String
   subject   String
   message   String
-  status    String   @default("NEW") // NEW, IN_PROGRESS, RESOLVED
+  status    String   @default("NEW")
   response  String?
   createdAt DateTime @default(now())
 }
@@ -569,7 +568,7 @@ model JobApplication {
   qualification String
   coverLetter   String
   resumeUrl     String?
-  status        String      @default("PENDING") // PENDING, SHORTLISTED, INTERVIEWED, REJECTED
+  status        String      @default("PENDING")
   createdAt     DateTime    @default(now())
 }
 
@@ -586,13 +585,13 @@ model FranchiseInquiry {
   estimatedInvestment String
   preferredLevels     String
   message             String?
-  status              String   @default("PENDING") // PENDING, REVIEWED, APPROVED, REJECTED
+  status              String   @default("PENDING")
   createdAt           DateTime @default(now())
 }
 
 model FAQ {
   id         String   @id @default(uuid())
-  category   String   // Admissions, Fee Payments, Academic, Uniform, General
+  category   String
   question   String
   answer     String
   orderIndex Int      @default(0)
@@ -604,7 +603,7 @@ model GalleryItem {
   id          String   @id @default(uuid())
   title       String
   description String?
-  category    String   // Activities, Classroom, Sports, Events, Awards, Campus
+  category    String
   imageUrl    String
   eventDate   String?
   isPublished Boolean  @default(true)
@@ -616,7 +615,7 @@ model SchoolSetting {
   id        String   @id @default(uuid())
   key       String   @unique
   value     String
-  category  String   @default("GENERAL") // GENERAL, BRAND, CONTACT, ACADEMIC, DEVELOPER
+  category  String   @default("GENERAL")
   updatedAt DateTime @updatedAt
 }
 
@@ -624,8 +623,8 @@ model AuditLog {
   id        String   @id @default(uuid())
   userId    String?
   user      User?    @relation(fields: [userId], references: [id])
-  action    String   // CREATE, UPDATE, DELETE, LOGIN, EXPORT, PAYMENT_RECORDED, SALARY_PAID
-  entity    String   // STUDENT, FEE, ATTENDANCE, EXAM, PAYROLL, USER, SETTING
+  action    String
+  entity    String
   entityId  String?
   details   String?
   ipAddress String?
