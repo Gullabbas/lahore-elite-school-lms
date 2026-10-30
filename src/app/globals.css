@@ -17,7 +17,79 @@
     color: var(--foreground);
     font-feature-settings: "rlig" 1, "calt" 1;
     -webkit-font-smoothing: antialiased;
+    overflow-x: hidden;
   }
+}
+
+/* 2026 Apple / Samsung Modern UI Utilities */
+.perspective-1200 {
+  perspective: 1200px;
+}
+.perspective-2000 {
+  perspective: 2000px;
+}
+.transform-style-3d {
+  transform-style: preserve-3d;
+}
+.backface-hidden {
+  backface-visibility: hidden;
+}
+
+/* Specular Shimmer on 3D Buttons & Cards */
+.btn-shimmer {
+  position: relative;
+  overflow: hidden;
+}
+.btn-shimmer::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 60%;
+  height: 100%;
+  background: linear-gradient(
+    90deg,
+    transparent,
+    rgba(255, 255, 255, 0.35),
+    transparent
+  );
+  transform: skewX(-20deg);
+  transition: none;
+}
+.btn-shimmer:hover::before {
+  animation: shimmer 1.2s ease-in-out infinite;
+}
+
+/* 3D Floating Icon Capsule */
+.icon-3d-badge {
+  position: relative;
+  transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+}
+.icon-3d-badge:hover {
+  transform: translateY(-4px) scale(1.05) rotate(2deg);
+}
+
+/* Frosted Glass Panels */
+.glass-surface {
+  background: rgba(255, 255, 255, 0.78);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid rgba(255, 255, 255, 0.6);
+}
+
+.glass-surface-dark {
+  background: rgba(9, 26, 74, 0.85);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid rgba(255, 208, 47, 0.25);
+}
+
+/* Interactive 3D Card Hover Lift */
+.card-3d-lift {
+  transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.4s cubic-bezier(0.16, 1, 0.3, 1), border-color 0.4s ease;
+}
+.card-3d-lift:hover {
+  transform: translateY(-6px);
 }
 
 /* Custom Scrollbar */

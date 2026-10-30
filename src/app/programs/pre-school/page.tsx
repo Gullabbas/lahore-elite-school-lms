@@ -57,13 +57,16 @@ export default function PreSchoolPage() {
             </div>
 
             <div className="lg:col-span-6">
-              <div className="relative w-full h-72 sm:h-88 rounded-2xl overflow-hidden border-2 border-school-border shadow-md">
+              <div className="relative w-full aspect-[16/9] rounded-3xl overflow-hidden border-2 border-school-border shadow-2xl bg-slate-900 group card-3d-lift">
                 <Image
-                  src="/images/programs/pre-school.png"
+                  src="/images/programs/pre-school.jpg"
                   alt="Pre-School at Lahore Elite School"
                   fill
-                  className="object-cover"
+                  sizes="(max-width: 1024px) 100vw, 50vw"
+                  className="object-cover object-top group-hover:scale-105 transition-transform duration-700 ease-out"
+                  priority
                 />
+                <div className="absolute inset-0 bg-gradient-to-t from-black/40 via-transparent to-transparent pointer-events-none" />
               </div>
             </div>
           </div>
